@@ -1,13 +1,16 @@
 ﻿<div class="memory-card" @onclick="OnClickAsync">
     @if (Card.IsFlipped || Card.IsMatched)
     {
-        <div class="memory-card-front" style="background-color:@Card.Color.GetBackground(); color:@Card.Color.GetTextColor();">
+        <div class="memory-card-front"
+             style="background-color:@Card.Color.GetBackground(); color:@Card.Color.GetTextColor();">
             @Card.Number
         </div>
     }
     else
     {
-        <div class="memory-card-back">?</div>
+        <div class="memory-card-back">
+            ?
+        </div>
     }
 </div>
 
