@@ -18,21 +18,18 @@
     <br/>
 
     <div class="row">
-        <div class="col-md-9">
-            @if (_isIntermediateMode)
+        <div class="col-md-9 game-area">
+
+            @if (_cards != null)
             {
-                <IntermediateCardGameComponent></IntermediateCardGameComponent>
+                @foreach (var card in _cards)
+                {
+                    <CardComponent Card="@card" OnFlip="HandleCardFlip"/>
+                }
             }
-            else if (_isAdvancedMode)
-            {
-                <AdvancedCardGameComponent></AdvancedCardGameComponent>
-            }
-            else
-            {
-                <BeginnerCardGameComponent></BeginnerCardGameComponent>
-            }
+
         </div>
-        <div class="col-md-1 d-flex justify-content-center">
+        <div class="col-md-1 d-flex justify-content-center game-history-area">
             <div class="vr"></div>
         </div>
         <div class="col-md-2 text-center">Game History</div>
@@ -42,36 +39,83 @@
 
 @code{
 
-    public Card Card { get; set; }
     private List<Card> _cards;
+    private List<Card> _flippedCards;
+    private List<string> _gamesWonHistory;
     private TimeSpan _gameDuration;
-    private bool _isTimeRunning = false;
-    private bool _isGameOver = false;
-    private bool _isBeginnerMode = true;
-    private bool _isIntermediateMode;
-    private bool _isAdvancedMode;
+    private bool _isTimeRunning;
+    private bool _isGameOver;
     private int _gamesWon;
 
+    protected override void OnInitialized()
+    {
+        _flippedCards = new List<Card>();
+        _gamesWonHistory = new List<string>();
+        BeginnerGameMode();
+    }
 
     private void BeginnerGameMode()
     {
-        _isBeginnerMode = true;
-        _isIntermediateMode = false;
-        _isAdvancedMode = false;
+        GenerateCards(2);
     }
 
     private void IntermediateGameMode()
     {
-        _isBeginnerMode = false;
-        _isIntermediateMode = true;
-        _isAdvancedMode = false;
+        GenerateCards(4);
     }
 
     private void AdvancedGameMode()
     {
-        _isBeginnerMode = false;
-        _isIntermediateMode = false;
-        _isAdvancedMode = true;
+        GenerateCards(6);
     }
+
+    private void GenerateCards(int pairs)
+    {
+        var list = new List<Card>();
+        var colors = Enum.GetValues<MemoryGame.Models.Color>().ToArray();
+        for (var i = 0; i < pairs; i++)
+        {
+            var number = i + 1;
+            var color = colors[i % colors.Length];
+            list.Add(new Card { Number = number, Color = color });
+            list.Add(new Card { Number = number, Color = color });
+        }
+
+        _cards = Shuffle(list);
+        StateHasChanged();
+    }
+
+    private List<Card> Shuffle(List<Card> source)
+    {
+        var rng = new Random();
+        return source.OrderBy(_ => rng.Next()).ToList();
+    }
+
+    private async Task HandleCardFlip(Card flipped)
+    {
+        _flippedCards.Add(flipped);
+
+        if (_flippedCards.Count == 2)
+        {
+            var a = _flippedCards[0];
+            var b = _flippedCards[1];
+
+            if (a.Number == b.Number)
+            {
+                a.IsMatched = true;
+                b.IsMatched = true;
+            }
+            else
+            {
+                await Task.Delay(500);
+                a.IsFlipped = false;
+                b.IsFlipped = false;
+            }
+
+            _flippedCards.Clear();
+            StateHasChanged();
+        }
+    }
+
 
 }

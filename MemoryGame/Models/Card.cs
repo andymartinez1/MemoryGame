@@ -9,6 +9,8 @@ public class Card
     public int Number { get; set; }
 
     public bool IsFlipped { get; set; }
+
+    public bool IsMatched { get; set; }
 }
 
 public enum Color
