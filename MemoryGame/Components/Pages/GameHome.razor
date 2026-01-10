@@ -1,53 +1,74 @@
 ﻿@page "/"
-@using MemoryGame.Components.CardComponents
 @rendermode InteractiveServer
+@implements IDisposable
+@inject IGameService GameService
 
 <PageTitle>Memory Game</PageTitle>
-
-
 
 <div class="container-fluid">
     <header class="navbar navbar-expand-lg navbar-light bg-light flex-fill">
         <h1 class="text-center me-auto">Memory Game</h1>
         <h5 class="m-1"> Select Game Mode:</h5>
-        <button type="button" class="btn btn-success m-1" @onclick="BeginnerGameMode">Beginner</button>
-        <button type="button" class="btn btn-secondary m-1" @onclick="IntermediateGameMode">Intermediate</button>
-        <button type="button" class="btn btn-danger m-1" @onclick="AdvancedGameMode">Advanced</button>
+        <button type="button" class="btn btn-success m-1" @onclick="@(() => GameMode(GameDifficulty.Beginner, 3))">
+            Beginner
+        </button>
+        <button type="button" class="btn btn-secondary m-1"
+                @onclick="@(() => GameMode(GameDifficulty.Intermediate, 6))">Intermediate
+        </button>
+        <button type="button" class="btn btn-danger m-1" @onclick="@(() => GameMode(GameDifficulty.Advanced, 9))">
+            Advanced
+        </button>
     </header>
 
     <br/>
+    @if (_isGameOver)
+    {
+        <div class="row justify-content-center">
+            <h3 class="text-center">YOU WIN!</h3>
+        </div>
+    }
+    else
+    {
+        <div class="row justify-content-center">
+            <h3 class="text-center">@GetElapsedDisplay()</h3>
+            <button type="button" class="btn btn-primary m-1" style="width: 10rem" @onclick="@StartTimer"
+                    disabled="@(_isTimeRunning || _isGameOver)">Start Game
+            </button>
+        </div>
+    }
 
     <div class="row">
         <div class="col-md-9 game-area">
 
-            @if (_cards != null)
+            @foreach (var card in _cards)
             {
-                @foreach (var card in _cards)
-                {
-                    <CardComponent Card="@card" OnFlip="HandleCardFlip"/>
-                }
-            }
-
-            @if (_isGameOver)
-            {
-                <p>GAME OVER</p>
+                <CardComponent Card="@card" OnFlip="HandleCardFlip" IsEnabled="_isTimeRunning"/>
             }
 
         </div>
         <div class="col-md-1 d-flex justify-content-center game-history-area">
             <div class="vr"></div>
         </div>
-        <div class="col-md-2 text-center">Game History</div>
+        <div class="col-md-2 text-center">
+            <h3>Game History</h3>
+            @foreach (var game in _gamesWonHistory)
+            {
+                <div>@game</div>
+            }
+        </div>
     </div>
 </div>
 
 
 @code{
 
-    private List<Card> _cards;
-    private List<Card> _flippedCards;
-    private List<string> _gamesWonHistory;
+    private List<Card>? _cards;
+    private List<Card>? _flippedCards;
+    private List<string>? _gamesWonHistory;
+    private DateTime _startTime;
     private TimeSpan _gameDuration;
+    private Timer? _gameTimer;
+    private GameDifficulty _currentDifficulty;
     private bool _isTimeRunning;
     private bool _isGameOver;
     private int _gamesWon;
@@ -56,51 +77,31 @@
     {
         _flippedCards = new List<Card>();
         _gamesWonHistory = new List<string>();
-        BeginnerGameMode();
+
+        _gameTimer = new Timer(250) { AutoReset = true };
+        _gameTimer.Elapsed += async (_, __) => await InvokeAsync(StateHasChanged);
+
+        GameMode(GameDifficulty.Beginner, 3);
     }
 
-    private void BeginnerGameMode()
+    private void GameMode(GameDifficulty gameDifficulty, int pairs)
     {
-        GenerateCards(2);
-    }
-
-    private void IntermediateGameMode()
-    {
-        GenerateCards(4);
-    }
-
-    private void AdvancedGameMode()
-    {
-        GenerateCards(6);
-    }
-
-    private void GenerateCards(int pairs)
-    {
-        var list = new List<Card>();
-        var colors = Enum.GetValues<Color>();
-        for (var i = 0; i < pairs; i++)
-        {
-            var number = i + 1;
-            var color = colors[i % colors.Length];
-            list.Add(new Card { Number = number, Color = color });
-            list.Add(new Card { Number = number, Color = color });
-        }
-
-        _cards = Shuffle(list);
-        StateHasChanged();
-    }
-
-    private List<Card> Shuffle(List<Card> source)
-    {
-        var rng = new Random();
-        return source.OrderBy(_ => rng.Next()).ToList();
+        _isGameOver = false;
+        _gameDuration = TimeSpan.Zero;
+        _isTimeRunning = false;
+        _gameTimer?.Stop();
+        _currentDifficulty = gameDifficulty;
+        _cards = GameService.GenerateCards(pairs, _currentDifficulty);
+        InvokeAsync(StateHasChanged);
     }
 
     private async Task HandleCardFlip(Card flipped)
     {
-        _flippedCards.Add(flipped);
+        if (!_isTimeRunning) return;
 
-        if (_flippedCards.Count == 2)
+        _flippedCards?.Add(flipped);
+
+        if (_flippedCards?.Count == 2)
         {
             var a = _flippedCards[0];
             var b = _flippedCards[1];
@@ -119,19 +120,41 @@
 
             _flippedCards.Clear();
 
-            if (!AnyFlippableCards())
+            if (!GameService.AnyFlippableCards(_cards))
             {
                 _isGameOver = true;
+                _isTimeRunning = false;
+                _gameDuration = DateTime.UtcNow - _startTime;
+                _gamesWon++;
+
+                var entry = $"Game {_gamesWon} - Level: {_currentDifficulty} - Time: {_gameDuration.ToString(@"mm\:ss")}";
+                _gamesWonHistory?.Add(entry);
             }
 
-            StateHasChanged();
+            await InvokeAsync(StateHasChanged);
         }
     }
 
-    private bool AnyFlippableCards()
+    private async Task StartTimer()
     {
-        return _cards != null && _cards.Any(c => !c.IsMatched && !c.IsFlipped);
+        if (_isTimeRunning || _isGameOver || _cards == null) return;
+        _startTime = DateTime.UtcNow;
+        _isTimeRunning = true;
+        _gameTimer?.Start();
+        await InvokeAsync(StateHasChanged);
     }
 
+    private string GetElapsedDisplay()
+    {
+        var elapsed = _isTimeRunning ? DateTime.UtcNow - _startTime : _gameDuration;
+        return elapsed.ToString(@"mm\:ss");
+    }
+
+    public void Dispose()
+    {
+        _gameTimer?.Stop();
+        _gameTimer?.Dispose();
+        _gameTimer = null;
+    }
 
 }

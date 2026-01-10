@@ -11,6 +11,8 @@ public class Card
     public bool IsFlipped { get; set; }
 
     public bool IsMatched { get; set; }
+
+    public GameDifficulty GameDifficulty { get; set; }
 }
 
 public enum Color
@@ -21,4 +23,11 @@ public enum Color
     Green,
     Blue,
     Purple
+}
+
+public enum GameDifficulty
+{
+    Beginner,
+    Intermediate,
+    Advanced
 }

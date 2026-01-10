@@ -1,4 +1,4 @@
-﻿<div class="memory-card" @onclick="OnClickAsync">
+﻿<div class="memory-card" @onclick="OnClickAsync" style="cursor:@(IsEnabled ? "pointer" : "not-allowed")">
     @if (Card.IsFlipped || Card.IsMatched)
     {
         <div class="memory-card-front"
@@ -20,10 +20,13 @@
 
     [Parameter] public Card Card { get; set; }
     [Parameter] public EventCallback<Card> OnFlip { get; set; }
+    [Parameter] public bool IsEnabled { get; set; } = true;
 
     private async Task OnClickAsync()
     {
-        if (Card.IsMatched) return;
+        if(!IsEnabled) return;
+        if (Card.IsMatched || Card.IsFlipped) return;
+
         Card.IsFlipped = true;
         await OnFlip.InvokeAsync(Card);
     }
