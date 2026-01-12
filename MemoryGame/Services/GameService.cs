@@ -9,7 +9,7 @@ public class GameService : IGameService
 
     public List<Card> GenerateCards(int pairs, GameDifficulty difficulty)
     {
-        var list = new List<Card>();
+        var cardList = new List<Card>();
         var colors = Enum.GetValues<Color>();
         for (var i = 0; i < pairs; i++)
         {
@@ -19,19 +19,19 @@ public class GameService : IGameService
             {
                 Number = number,
                 Color = color,
-                GameDifficulty = difficulty
+                GameDifficulty = difficulty,
             };
             var cardB = new Card
             {
                 Number = number,
                 Color = color,
-                GameDifficulty = difficulty
+                GameDifficulty = difficulty,
             };
-            list.Add(cardA);
-            list.Add(cardB);
+            cardList.Add(cardA);
+            cardList.Add(cardB);
         }
 
-        return Shuffle(list);
+        return Shuffle(cardList);
     }
 
     public List<Card> Shuffle(List<Card> source)
@@ -41,6 +41,6 @@ public class GameService : IGameService
 
     public bool AnyFlippableCards(IEnumerable<Card> cards)
     {
-        return cards != null && cards.Any(c => !c.IsMatched && !c.IsFlipped);
+        return cards.Any(c => !c.IsMatched && !c.IsFlipped);
     }
 }
