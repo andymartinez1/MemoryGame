@@ -4,9 +4,9 @@ namespace MemoryGame.Helpers;
 
 public static class ColorExtensions
 {
-    public static string GetBackground(this Color c)
+    public static string GetBackground(this Color color)
     {
-        return c switch
+        return color switch
         {
             Color.Red => "#e74c3c",
             Color.Orange => "#e67e22",
@@ -18,9 +18,9 @@ public static class ColorExtensions
         };
     }
 
-    public static string GetTextColor(this Color c)
+    public static string GetTextColor(this Color color)
     {
-        return c switch
+        return color switch
         {
             Color.Yellow => "#000000",
             _ => "#ffffff"

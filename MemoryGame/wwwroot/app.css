@@ -1,9 +1,13 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
 html, body {
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-family: "Press Start 2P", system-ui;
 }
 
 body {
-    /*background-color: #636363;*/
+    background-size: cover;
+    background: radial-gradient(circle at 20% 10%, rgba(255, 255, 255, 0.04), transparent 20%),
+    linear-gradient(135deg, #0f2027 0%, #2c5364 50%, #4ca1af 100%) fixed;
 }
 
 a, .btn-link {
@@ -26,6 +30,19 @@ a, .btn-link {
     grid-auto-rows: 15rem;
     gap: 1rem;
     align-items: stretch;
+}
+
+.navbar {
+
+
+    align-items: center;
+    justify-content: center;
+
+
+    & img {
+        height: 7rem;
+        max-width: 100%;
+    }
 }
 
 .memory-card {
@@ -51,7 +68,11 @@ a, .btn-link {
 }
 
 .container-fluid {
-    margin: 0 auto;
+    margin: 1.5rem auto;
+    width: 90%;
+    padding: 3rem;
+    border-radius: 1rem;
+    background-color: #fff;
 }
 
 .content {
@@ -88,11 +109,3 @@ h1:focus {
     border-color: #929292;
 }
 
-.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
-    color: var(--bs-secondary-color);
-    text-align: end;
-}
-
-.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
-    text-align: start;
-}

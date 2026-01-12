@@ -15,20 +15,20 @@ public class GameService : IGameService
         {
             var number = i + 1;
             var color = colors[i % colors.Length];
-            var a = new Card
+            var cardA = new Card
             {
                 Number = number,
                 Color = color,
-                GameDifficulty = difficulty,
+                GameDifficulty = difficulty
             };
-            var b = new Card
+            var cardB = new Card
             {
                 Number = number,
                 Color = color,
-                GameDifficulty = difficulty,
+                GameDifficulty = difficulty
             };
-            list.Add(a);
-            list.Add(b);
+            list.Add(cardA);
+            list.Add(cardB);
         }
 
         return Shuffle(list);

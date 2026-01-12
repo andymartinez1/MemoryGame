@@ -13,8 +13,8 @@ card given the number and color of the cards.
 
 ## Known Issues
 
-[!Caution]
-Clicking the cards too fast will break the game!
+> [!Caution]  
+> Clicking the cards too fast will break the game!
 
 ## Getting Started
 

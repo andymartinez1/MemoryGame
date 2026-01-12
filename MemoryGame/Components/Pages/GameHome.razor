@@ -6,13 +6,14 @@
 <PageTitle>Memory Game</PageTitle>
 
 <div class="container-fluid">
-    <header class="navbar navbar-expand-lg navbar-light bg-light flex-fill">
+    <header class="navbar navbar-expand-lg flex-fill">
+        <img src="/images/logo.png" alt="logo"/>
         <h1 class="text-center me-auto">Memory Game</h1>
-        <h5 class="m-1"> Select Game Mode:</h5>
+        <h6 class="m-1"> Select Game Mode:</h6>
         <button type="button" class="btn btn-success m-1" @onclick="@(() => GameMode(GameDifficulty.Beginner, 3))">
             Beginner
         </button>
-        <button type="button" class="btn btn-secondary m-1"
+        <button type="button" class="btn btn-primary m-1"
                 @onclick="@(() => GameMode(GameDifficulty.Intermediate, 6))">Intermediate
         </button>
         <button type="button" class="btn btn-danger m-1" @onclick="@(() => GameMode(GameDifficulty.Advanced, 9))">
@@ -20,7 +21,6 @@
         </button>
     </header>
 
-    <br/>
     @if (_isGameOver)
     {
         <div class="row justify-content-center">
@@ -31,8 +31,8 @@
     {
         <div class="row justify-content-center">
             <h3 class="text-center">@GetElapsedDisplay()</h3>
-            <button type="button" class="btn btn-primary m-1" style="width: 10rem" @onclick="@StartTimer"
-                    disabled="@(_isTimeRunning || _isGameOver)">Start Game
+            <button type="button" class="btn btn-secondary m-1" style="width: 10rem" @onclick="@StartTimer"
+                    disabled="@(_isTimeRunning || _isGameOver)">Start Game!
             </button>
         </div>
     }
@@ -50,10 +50,10 @@
             <div class="vr"></div>
         </div>
         <div class="col-md-2 text-center">
-            <h3>Game History</h3>
+            <h4>Game History</h4>
             @foreach (var game in _gamesWonHistory)
             {
-                <div>@game</div>
+                <p>@game</p>
             }
         </div>
     </div>
