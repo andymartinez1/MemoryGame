@@ -26,6 +26,7 @@
     <Using Include="NUnit.Framework" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\src\MemoryGame\MemoryGame.csproj" />
     <ProjectReference Include="..\MemoryGame\MemoryGame.csproj" />
   </ItemGroup>
 </Project>
