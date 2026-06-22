@@ -4,7 +4,7 @@ This memory game utilizes Blazor's state management for users to flip and match 
 card given the number and color of the cards. It provides a game history list showing which difficulty was selected and
 how long it took to win that game. 
 
-![memory.png](MemoryGame/docs/images/memory.png)
+![memory.png](docs/images/memory.png)
 
 ## Features
 
