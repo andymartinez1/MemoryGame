@@ -58,7 +58,7 @@
 
     private List<Card>? _cards;
     private List<Card>? _flippedCards;
-    private List<string>? _gamesWonHistory;
+    private List<GameHistoryEntry>? _gamesWonHistory;
     private DateTime _startTime;
     private TimeSpan _gameDuration;
     private Timer? _gameTimer;
@@ -70,7 +70,7 @@
     protected override void OnInitialized()
     {
         _flippedCards = new List<Card>();
-        _gamesWonHistory = new List<string>();
+        _gamesWonHistory = new List<GameHistoryEntry>();
 
         _gameTimer = new Timer(250) { AutoReset = true };
         _gameTimer.Elapsed += async (_, __) => await InvokeAsync(StateHasChanged);
@@ -121,8 +121,12 @@
                 _gameDuration = DateTime.UtcNow - _startTime;
                 _gamesWon++;
 
-                var entry = $"Game {_gamesWon} - {_currentDifficulty} {_gameDuration.ToString(@"mm\:ss")}";
-                _gamesWonHistory?.Add(entry);
+                _gamesWonHistory?.Add(new GameHistoryEntry
+                {
+                    GameNumber = _gamesWon,
+                    Difficulty = _currentDifficulty,
+                    Duration = _gameDuration
+                });
             }
 
             await InvokeAsync(StateHasChanged);

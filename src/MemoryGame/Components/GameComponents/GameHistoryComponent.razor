@@ -2,12 +2,12 @@
     <h4>Game History</h4>
     @foreach (var game in GamesWonHistory)
     {
-        <p>@game</p>
+        <p>Game @game.GameNumber - @game.Difficulty @game.Duration.ToString(@"mm\:ss")</p>
     }
 </div>
 
 @code {
-    [Parameter] public List<string>? GamesWonHistory { get; set; }
+    [Parameter] public List<GameHistoryEntry>? GamesWonHistory { get; set; }
 }
 
 <style>
