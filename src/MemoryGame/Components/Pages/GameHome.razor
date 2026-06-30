@@ -121,7 +121,7 @@
                 _gameDuration = DateTime.UtcNow - _startTime;
                 _gamesWon++;
 
-                var entry = $"Game {_gamesWon} - Level: {_currentDifficulty} - Time: {_gameDuration.ToString(@"mm\:ss")}";
+                var entry = $"Game {_gamesWon} - {_currentDifficulty} {_gameDuration.ToString(@"mm\:ss")}";
                 _gamesWonHistory?.Add(entry);
             }
 
